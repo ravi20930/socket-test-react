@@ -1,21 +1,23 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-const socket = io.connect("http://localhost:4000", { cors: { origin: '*' } });
 
 
 function App() {
   const [builds, setBuilds] = useState([]);
 
   useEffect(() => {
+    const socket = io("http://localhost:3000", { cors: { origin: '*' } });
     socket.on('connection', () => {
       console.log('Connected to socket server.');
     });
-
     // Listen for the `newBuild` event and update the state with the relevant data
     socket.on('newBuild', data => {
       setBuilds(prevBuilds => [...prevBuilds, data]);
     });
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   return (
